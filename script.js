@@ -21,6 +21,7 @@ const characterContainer = document.getElementById('character-container');
 const shenronContainer = document.getElementById('shenron-container');
 const villainContainer = document.getElementById('villain-container');
 const villainImage = document.getElementById('villain-image');
+const attackEffect = document.getElementById('attack-effect');
 
 let currentQuestionIndex = 0;
 let score = 0;
@@ -146,6 +147,7 @@ function resetState() {
     feedbackContainer.style.display = "none";
     feedbackContainer.classList.remove("correct", "incorrect");
     villainContainer.style.display = "none";
+    attackEffect.classList.remove('active');
 }
 
 // Handle answer selection
@@ -157,11 +159,11 @@ function selectAnswer(e) {
         score++;
         createConfetti();
         feedbackContainer.classList.add("correct");
-        characterContainer.classList.add("power-up");
+        characterPowerUp();
     } else {
         selectedButton.classList.add("incorrect", "bg-red-500", "text-white");
         feedbackContainer.classList.add("incorrect");
-        showVillain();
+        showVillainAttack();
     }
     Array.from(answerButtons.children).forEach(button => {
         if (button.dataset.correct === "true") {
@@ -385,16 +387,156 @@ function createShenron() {
     shenronImage.src = '/placeholder.svg?height=300&width=300';
     shenronImage.alt = 'Shenron';
     shenronContainer.appendChild(shenronImage);
+    
+    // Animate Shenron
+    anime({
+        targets: shenronImage,
+        translateX: ['100%', '-100%'],
+        translateY: ['-50px', '50px'],
+        rotate: [0, 360],
+        duration: 30000,
+        easing: 'linear',
+        loop: true
+    });
 }
 
-// Show villain
-function showVillain() {
+// Show villain attack
+function showVillainAttack() {
     const villain = dbzVillains[Math.floor(Math.random() * dbzVillains.length)];
     villainImage.src = villain.image;
     villainImage.alt = villain.name;
     villainContainer.style.display = 'block';
+
+    // Animate villain attack
+    anime({
+        targets: villainImage,
+        translateX: [300, 0],
+        translateY: [300, 0],
+        scale: [0, 1],
+        rotate: '1turn',
+        duration: 1000,
+        easing: 'easeOutExpo'
+    });
+
+    // Show attack effect
+    attackEffect.classList.add('active');
+    setTimeout(() => {
+        attackEffect.classList.remove('active');
+    }, 500);
+
+    // Show demotivational pop-up
+    Swal.fire({
+        title: 'Oops!',
+        text: 'You got hit by ' + villain.name + '! Try again!',
+        icon: 'error',
+        confirmButtonText: 'Power Up!',
+        background: '#fff url(/placeholder.svg?height=200&width=200)',
+        backdrop: `
+            rgba(0,0,123,0.4)
+            url("/placeholder.svg?height=200&width=200")
+            left top
+            no-repeat
+        `
+    });
+}
+
+// Character power-up animation
+function characterPowerUp() {
+    characterContainer.classList.add('power-up');
+    
+    // Animate character power-up
+    anime({
+        targets: characterImage,
+        scale: [1, 1.2, 1],
+        rotate: '1turn',
+        duration: 1000,
+        easing: 'easeInOutQuad'
+    });
+
+    // Add power-up effect
+    const powerUpEffect = document.createElement('div');
+    powerUpEffect.classList.add('power-up-effect');
+    characterContainer.appendChild(powerUpEffect);
+
+    anime({
+        targets: powerUpEffect,
+        scale: [0, 1.5],
+        opacity: [1, 0],
+        duration: 1000,
+        easing: 'easeOutExpo',
+        complete: function() {
+            powerUpEffect.remove();
+        }
+    });
 }
 
 // Start the quiz
+startQuiz();
+
+// Add event listener for window resize
+window.addEventListener('resize', function() {
+    // Adjust particle.js canvas size
+    if (window.pJSDom && window.pJSDom[0].pJS.canvas) {
+        window.pJSDom[0].pJS.canvas.w = window.innerWidth;
+        window.pJSDom[0].pJS.canvas.h = window.innerHeight;
+        window.pJSDom[0].pJS.fn.canvasPaint();
+        window.pJSDom[0].pJS.fn.canvasSize();
+    }
+});
+
+// Function to update quiz container size
+function updateQuizContainerSize() {
+    const quizContainer = document.getElementById('quiz-container');
+    const windowHeight = window.innerHeight;
+    const containerHeight = windowHeight * 0.8; // 80% of window height
+    quizContainer.style.maxHeight = `${containerHeight}px`;
+    quizContainer.style.overflowY = 'auto';
+}
+
+// Call the function on load and resize
+window.addEventListener('load', updateQuizContainerSize);
+window.addEventListener('resize', updateQuizContainerSize);
+
+// Add custom anime.js animation for question transitions
+function animateQuestionTransition() {
+    anime({
+        targets: '#question-container',
+        opacity: [0, 1],
+        translateY: [20, 0],
+        duration: 500,
+        easing: 'easeOutQuad'
+    });
+}
+
+// Modify showQuestion function to include animation
+const originalShowQuestion = showQuestion;
+showQuestion = function() {
+    originalShowQuestion();
+    animateQuestionTransition();
+};
+
+// Add background music
+const bgMusic = new Audio('/placeholder.mp3'); // Replace with actual DBZ theme music
+bgMusic.loop = true;
+bgMusic.volume = 0.3;
+
+// Function to toggle background music
+function toggleBgMusic() {
+    if (bgMusic.paused) {
+        bgMusic.play();
+    } else {
+        bgMusic.pause();
+    }
+}
+
+// Add music toggle button
+const musicToggleBtn = document.createElement('button');
+musicToggleBtn.innerHTML = '🎵';
+musicToggleBtn.classList.add('music-toggle-btn', 'fixed', 'top-4', 'right-4', 'bg-white', 'rounded-full', 'p-2', 'shadow-md', 'z-50');
+document.body.appendChild(musicToggleBtn);
+
+musicToggleBtn.addEventListener('click', toggleBgMusic);
+
+// Initialize the quiz
 startQuiz();
 
