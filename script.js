@@ -31,18 +31,18 @@ let timerInterval;
 let currentQuestions = [];
 
 const dbzCharacters = [
-    { name: 'Goku', image: '/placeholder.svg?height=128&width=128' },
-    { name: 'Vegeta', image: '/placeholder.svg?height=128&width=128' },
-    { name: 'Gohan', image: '/placeholder.svg?height=128&width=128' },
-    { name: 'Piccolo', image: '/placeholder.svg?height=128&width=128' },
-    { name: 'Trunks', image: '/placeholder.svg?height=128&width=128' }
+    { name: 'Goku', image: 'https://i.imgur.com/JYUB0m3.png' },
+    { name: 'Vegeta', image: 'https://i.imgur.com/YfxMdBE.png' },
+    { name: 'Gohan', image: 'https://i.imgur.com/pJOFY4D.png' },
+    { name: 'Piccolo', image: 'https://i.imgur.com/NbZVWAn.png' },
+    { name: 'Trunks', image: 'https://i.imgur.com/TSvGzTr.png' }
 ];
 
 const dbzVillains = [
-    { name: 'Frieza', image: '/placeholder.svg?height=300&width=300' },
-    { name: 'Cell', image: '/placeholder.svg?height=300&width=300' },
-    { name: 'Majin Buu', image: '/placeholder.svg?height=300&width=300' },
-    { name: 'Broly', image: '/placeholder.svg?height=300&width=300' }
+    { name: 'Frieza', image: 'https://i.imgur.com/8xQyoOS.png' },
+    { name: 'Cell', image: 'https://i.imgur.com/QQGN9JY.png' },
+    { name: 'Majin Buu', image: 'https://i.imgur.com/CU1BLFa.png' },
+    { name: 'Broly', image: 'https://i.imgur.com/XfaWWbS.png' }
 ];
 
 const dbzQuestions = [
@@ -251,10 +251,10 @@ function showResult() {
     timerDisplay.parentElement.style.display = "none";
     createConfetti();
     if (score > currentQuestions.length / 2) {
-        characterImage.src = '/placeholder.svg?height=128&width=128'; // Super Saiyan image
+        characterImage.src = 'https://i.imgur.com/JYUB0m3.png'; // Super Saiyan Goku
         characterContainer.classList.add("power-up");
     } else {
-        characterImage.src = '/placeholder.svg?height=128&width=128'; // Normal Goku image
+        characterImage.src = 'https://i.imgur.com/pJOFY4D.png'; // Normal Goku
     }
 }
 
@@ -382,22 +382,26 @@ function updateCharacter() {
 
 // Create Shenron
 function createShenron() {
-    shenronContainer.innerHTML = '';
-    const shenronImage = document.createElement('img');
-    shenronImage.src = '/placeholder.svg?height=300&width=300';
-    shenronImage.alt = 'Shenron';
-    shenronContainer.appendChild(shenronImage);
-    
-    // Animate Shenron
-    anime({
-        targets: shenronImage,
-        translateX: ['100%', '-100%'],
-        translateY: ['-50px', '50px'],
-        rotate: [0, 360],
-        duration: 30000,
-        easing: 'linear',
-        loop: true
-    });
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    shenronContainer.appendChild(renderer.domElement);
+
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const shenron = new THREE.Mesh(geometry, material);
+    scene.add(shenron);
+
+    camera.position.z = 30;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        shenron.rotation.x += 0.01;
+        shenron.rotation.y += 0.01;
+        renderer.render(scene, camera);
+    }
+    animate();
 }
 
 // Show villain attack
@@ -430,10 +434,10 @@ function showVillainAttack() {
         text: 'You got hit by ' + villain.name + '! Try again!',
         icon: 'error',
         confirmButtonText: 'Power Up!',
-        background: '#fff url(/placeholder.svg?height=200&width=200)',
+        background: '#fff url(' + villain.image + ')',
         backdrop: `
             rgba(0,0,123,0.4)
-            url("/placeholder.svg?height=200&width=200")
+            url("https://i.imgur.com/CU1BLFa.png")
             left top
             no-repeat
         `
@@ -516,7 +520,7 @@ showQuestion = function() {
 };
 
 // Add background music
-const bgMusic = new Audio('/placeholder.mp3'); // Replace with actual DBZ theme music
+const bgMusic = new Audio('https://example.com/dbz-theme.mp3'); // Replace with actual DBZ theme music URL
 bgMusic.loop = true;
 bgMusic.volume = 0.3;
 
@@ -532,7 +536,7 @@ function toggleBgMusic() {
 // Add music toggle button
 const musicToggleBtn = document.createElement('button');
 musicToggleBtn.innerHTML = '🎵';
-musicToggleBtn.classList.add('music-toggle-btn', 'fixed', 'top-4', 'right-4', 'bg-white', 'rounded-full', 'p-2', 'shadow-md', 'z-50');
+musicToggleBtn.classList.add('music-toggle-btn');
 document.body.appendChild(musicToggleBtn);
 
 musicToggleBtn.addEventListener('click', toggleBgMusic);

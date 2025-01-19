@@ -8,17 +8,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 min-h-screen flex flex-col justify-between overflow-hidden">
     <div id="shenron-container" class="fixed inset-0 pointer-events-none z-0"></div>
+    <div id="animated-characters" class="fixed inset-0 pointer-events-none z-10"></div>
     <div id="particles-js" class="absolute inset-0"></div>
-    <main class="flex-grow flex items-center justify-center py-8 relative z-10">
+    <main class="flex-grow flex items-center justify-center py-8 relative z-20">
         <div id="quiz-container" class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full relative overflow-hidden">
             <h1 class="text-4xl font-bold mb-6 text-center text-orange-600">Dragon Ball Z Quiz Adventure!</h1>
             
             <div id="character-container" class="absolute top-0 right-0 w-32 h-32">
-                <img id="character-image" src="/placeholder.svg?height=128&width=128" alt="DBZ Character" class="w-full h-full object-contain">
+                <img id="character-image" src="https://i.imgur.com/JYUB0m3.png" alt="Goku" class="w-full h-full object-contain">
             </div>
             
             <div id="question-container" class="mb-6">
@@ -66,13 +68,13 @@
         </div>
     </main>
 
-    <div id="villain-container" class="fixed inset-0 pointer-events-none hidden z-20">
-        <img id="villain-image" src="/placeholder.svg?height=300&width=300" alt="DBZ Villain" class="absolute bottom-0 right-0 w-64 h-64 object-contain">
+    <div id="villain-container" class="fixed inset-0 pointer-events-none hidden z-30">
+        <img id="villain-image" src="https://i.imgur.com/8xQyoOS.png" alt="Frieza" class="absolute bottom-0 right-0 w-64 h-64 object-contain">
     </div>
 
-    <div id="attack-effect" class="fixed inset-0 pointer-events-none hidden z-30"></div>
+    <div id="attack-effect" class="fixed inset-0 pointer-events-none hidden z-40"></div>
 
-    <footer class="bg-gray-800 text-white py-4 text-center relative z-10">
+    <footer class="bg-gray-800 text-white py-4 text-center relative z-50">
         <p>Created with 🐉 by Dragon Ball Z Quiz Masters</p>
         <p>© 2023 Dragon Ball Z Quiz Adventure. All rights reserved.</p>
         <div class="mt-2">
@@ -82,9 +84,10 @@
         </div>
     </footer>
 
-    <div id="confetti-container" class="fixed inset-0 pointer-events-none hidden z-40"></div>
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none hidden z-60"></div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
+
