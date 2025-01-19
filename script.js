@@ -1,106 +1,3 @@
-// Quiz questions with difficulty levels
-const questions = [
-    {
-        question: "What's the secret ingredient in the Krabby Patty formula?",
-        answers: [
-            { text: "Love", correct: false },
-            { text: "Seahorse radish", correct: false },
-            { text: "A pinch of King Neptune's Poseidon Powder", correct: true },
-            { text: "Chum", correct: false }
-        ],
-        difficulty: "easy",
-        feedback: "The Krabby Patty's secret formula is a mystery, but in the show, it's hinted that King Neptune's Poseidon Powder might be the key ingredient!"
-    },
-    {
-        question: "Which planet is known for its fabulous ring collection?",
-        answers: [
-            { text: "Jupiter, the fashionista", correct: false },
-            { text: "Saturn, the cosmic showoff", correct: true },
-            { text: "Mars, the red carpet star", correct: false },
-            { text: "Uranus, the underappreciated trendsetter", correct: false }
-        ],
-        difficulty: "easy",
-        feedback: "Saturn is famous for its spectacular ring system, which is made up of ice particles, rocky debris, and dust."
-    },
-    {
-        question: "What do you call a fake noodle?",
-        answers: [
-            { text: "An impasta", correct: true },
-            { text: "A pseudoodle", correct: false },
-            { text: "A fauxccini", correct: false },
-            { text: "A mock-aroni", correct: false }
-        ],
-        difficulty: "easy",
-        feedback: "An 'impasta' is a clever play on words, combining 'impostor' and 'pasta'!"
-    },
-    {
-        question: "What is the capital of Burkina Faso?",
-        answers: [
-            { text: "Ouagadougou", correct: true },
-            { text: "Bobo-Dioulasso", correct: false },
-            { text: "Koudougou", correct: false },
-            { text: "Banfora", correct: false }
-        ],
-        difficulty: "medium",
-        feedback: "Ouagadougou is the capital of Burkina Faso, a country in West Africa."
-    },
-    {
-        question: "In what year did the French Revolution begin?",
-        answers: [
-            { text: "1776", correct: false },
-            { text: "1789", correct: true },
-            { text: "1804", correct: false },
-            { text: "1815", correct: false }
-        ],
-        difficulty: "medium",
-        feedback: "The French Revolution began in 1789 with the Storming of the Bastille on July 14th."
-    },
-    {
-        question: "What is the chemical symbol for the element Tungsten?",
-        answers: [
-            { text: "Tu", correct: false },
-            { text: "Tn", correct: false },
-            { text: "W", correct: true },
-            { text: "Tg", correct: false }
-        ],
-        difficulty: "medium",
-        feedback: "Tungsten's chemical symbol is W, which comes from its other name, Wolfram."
-    },
-    {
-        question: "What is the value of π (pi) to 7 decimal places?",
-        answers: [
-            { text: "3.1415926", correct: true },
-            { text: "3.1415927", correct: false },
-            { text: "3.1415928", correct: false },
-            { text: "3.1415929", correct: false }
-        ],
-        difficulty: "hard",
-        feedback: "The value of π (pi) to 7 decimal places is 3.1415926. It's an irrational number, which means its decimal representation never ends or repeats."
-    },
-    {
-        question: "What is the Fibonacci sequence for the first 8 numbers?",
-        answers: [
-            { text: "0, 1, 1, 2, 3, 5, 8, 13", correct: true },
-            { text: "1, 1, 2, 3, 5, 8, 13, 21", correct: false },
-            { text: "0, 1, 2, 3, 5, 8, 13, 21", correct: false },
-            { text: "1, 2, 3, 5, 8, 13, 21, 34", correct: false }
-        ],
-        difficulty: "hard",
-        feedback: "The Fibonacci sequence starts with 0 and 1, and each subsequent number is the sum of the two preceding ones."
-    },
-    {
-        question: "What is the half-life of Carbon-14?",
-        answers: [
-            { text: "5,730 years", correct: true },
-            { text: "1,000 years", correct: false },
-            { text: "10,000 years", correct: false },
-            { text: "50,000 years", correct: false }
-        ],
-        difficulty: "hard",
-        feedback: "The half-life of Carbon-14 is approximately 5,730 years. This makes it useful for dating organic materials up to about 60,000 years old."
-    }
-];
-
 // DOM elements
 const questionContainer = document.getElementById('question-container');
 const questionText = document.getElementById('question-text');
@@ -112,38 +9,59 @@ const progressDisplay = document.getElementById('progress');
 const resultContainer = document.getElementById('result-container');
 const finalScoreDisplay = document.getElementById('final-score');
 const retryButton = document.getElementById('retry-button');
-const showAnswersButton = document.getElementById('show-answers-button');
 const timerDisplay = document.getElementById('timer');
 const progressBar = document.getElementById('progress-bar');
 const confettiContainer = document.getElementById('confetti-container');
-const difficultySelection = document.getElementById('difficulty-selection');
-const difficultyButtons = document.querySelectorAll('.difficulty-button');
 const feedbackContainer = document.getElementById('feedback-container');
 const feedbackText = document.getElementById('feedback-text');
 const starRating = document.getElementById('star-rating');
 const stars = document.querySelectorAll('.star');
+const gokuImage = document.getElementById('goku-image');
+const gokuContainer = document.getElementById('goku-container');
+const gokuSprite = document.getElementById('goku-sprite');
 
 let currentQuestionIndex = 0;
 let score = 0;
 let answeredQuestions = [];
 let timeLeft = 60;
 let timerInterval;
-let selectedDifficulty = '';
 let currentQuestions = [];
 
+// Fetch questions from API
+async function fetchQuestions() {
+    try {
+        const response = await fetch('https://opentdb.com/api.php?amount=10&type=multiple');
+        const data = await response.json();
+        return data.results.map(q => ({
+            question: q.question,
+            answers: [
+                { text: q.correct_answer, correct: true },
+                ...q.incorrect_answers.map(answer => ({ text: answer, correct: false }))
+            ].sort(() => Math.random() - 0.5),
+            feedback: `The correct answer is: ${q.correct_answer}`
+        }));
+    } catch (error) {
+        console.error('Error fetching questions:', error);
+        return [];
+    }
+}
+
 // Initialize quiz
-function startQuiz(difficulty) {
-    selectedDifficulty = difficulty;
-    currentQuestions = questions.filter(q => q.difficulty === difficulty);
+async function startQuiz() {
+    currentQuestions = await fetchQuestions();
+    if (currentQuestions.length === 0) {
+        alert('Failed to fetch questions. Please try again later.');
+        return;
+    }
     currentQuestionIndex = 0;
     score = 0;
     answeredQuestions = new Array(currentQuestions.length).fill(false);
     nextButton.innerHTML = "Next";
     resultContainer.style.display = "none";
     questionContainer.style.display = "block";
-    difficultySelection.style.display = "none";
     startTimer();
     showQuestion();
+    gokuFlyAcrossScreen();
 }
 
 // Display current question
@@ -179,6 +97,7 @@ function resetState() {
     questionText.classList.remove('fade-in');
     feedbackContainer.style.display = "none";
     feedbackContainer.classList.remove("correct", "incorrect");
+    gokuSprite.classList.remove("super-saiyan", "flying");
 }
 
 // Handle answer selection
@@ -190,9 +109,11 @@ function selectAnswer(e) {
         score++;
         createConfetti();
         feedbackContainer.classList.add("correct");
+        gokuPowerUp();
     } else {
         selectedButton.classList.add("incorrect", "bg-red-500", "text-white");
         feedbackContainer.classList.add("incorrect");
+        gokuNormal();
     }
     Array.from(answerButtons.children).forEach(button => {
         if (button.dataset.correct === "true") {
@@ -279,34 +200,17 @@ function showResult() {
     questionContainer.style.display = "none";
     timerDisplay.parentElement.style.display = "none";
     createConfetti();
+    if (score > currentQuestions.length / 2) {
+        gokuSuperSaiyan();
+    } else {
+        gokuNormal();
+    }
 }
 
 // Handle retry button click
 retryButton.addEventListener("click", () => {
-    difficultySelection.style.display = "block";
-    resultContainer.style.display = "none";
+    startQuiz();
 });
-
-// Handle show answers button click
-showAnswersButton.addEventListener("click", () => {
-    showAnswers();
-});
-
-// Show correct answers
-function showAnswers() {
-    resetState();
-    questionText.innerHTML = "Correct Answers";
-    currentQuestions.forEach((question, index) => {
-        const answerParagraph = document.createElement("p");
-        answerParagraph.classList.add("mb-2", "fade-in");
-        answerParagraph.style.animationDelay = `${index * 0.1}s`;
-        const correctAnswer = question.answers.find(answer => answer.correct);
-        answerParagraph.innerHTML = `<strong>Q${index + 1}:</strong> ${correctAnswer.text}`;
-        answerButtons.appendChild(answerParagraph);
-    });
-    nextButton.style.display = "none";
-    prevButton.style.display = "none";
-}
 
 // Start timer
 function startTimer() {
@@ -371,14 +275,6 @@ particlesJS('particles-js', {
     retina_detect: true
 });
 
-// Handle difficulty selection
-difficultyButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const difficulty = button.dataset.difficulty;
-        startQuiz(difficulty);
-    });
-});
-
 // Handle star rating
 stars.forEach(star => {
     star.addEventListener('click', () => {
@@ -426,7 +322,29 @@ function resetStars() {
     });
 }
 
-// Start with difficulty selection
-difficultySelection.style.display = "block";
-questionContainer.style.display = "none";
+// Goku animations
+function gokuFlyAcrossScreen() {
+    gokuSprite.classList.add("flying");
+    setTimeout(() => {
+        gokuSprite.classList.remove("flying");
+    }, 5000);
+}
+
+function gokuPowerUp() {
+    gokuSprite.classList.add("super-saiyan");
+    setTimeout(() => {
+        gokuSprite.classList.remove("super-saiyan");
+    }, 2000);
+}
+
+function gokuSuperSaiyan() {
+    gokuSprite.classList.add("super-saiyan");
+}
+
+function gokuNormal() {
+    gokuSprite.classList.remove("super-saiyan");
+}
+
+// Start the quiz
+startQuiz();
 
