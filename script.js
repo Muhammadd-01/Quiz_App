@@ -1,4 +1,4 @@
-// Quiz questions
+// Quiz questions with difficulty levels
 const questions = [
     {
         question: "What's the secret ingredient in the Krabby Patty formula?",
@@ -7,7 +7,9 @@ const questions = [
             { text: "Seahorse radish", correct: false },
             { text: "A pinch of King Neptune's Poseidon Powder", correct: true },
             { text: "Chum", correct: false }
-        ]
+        ],
+        difficulty: "easy",
+        feedback: "The Krabby Patty's secret formula is a mystery, but in the show, it's hinted that King Neptune's Poseidon Powder might be the key ingredient!"
     },
     {
         question: "Which planet is known for its fabulous ring collection?",
@@ -16,7 +18,9 @@ const questions = [
             { text: "Saturn, the cosmic showoff", correct: true },
             { text: "Mars, the red carpet star", correct: false },
             { text: "Uranus, the underappreciated trendsetter", correct: false }
-        ]
+        ],
+        difficulty: "easy",
+        feedback: "Saturn is famous for its spectacular ring system, which is made up of ice particles, rocky debris, and dust."
     },
     {
         question: "What do you call a fake noodle?",
@@ -25,25 +29,75 @@ const questions = [
             { text: "A pseudoodle", correct: false },
             { text: "A fauxccini", correct: false },
             { text: "A mock-aroni", correct: false }
-        ]
+        ],
+        difficulty: "easy",
+        feedback: "An 'impasta' is a clever play on words, combining 'impostor' and 'pasta'!"
     },
     {
-        question: "Which animal's milk is used to make authentic mozzarella cheese?",
+        question: "What is the capital of Burkina Faso?",
         answers: [
-            { text: "Cow", correct: false },
-            { text: "Goat", correct: false },
-            { text: "Water Buffalo", correct: true },
-            { text: "Sheep", correct: false }
-        ]
+            { text: "Ouagadougou", correct: true },
+            { text: "Bobo-Dioulasso", correct: false },
+            { text: "Koudougou", correct: false },
+            { text: "Banfora", correct: false }
+        ],
+        difficulty: "medium",
+        feedback: "Ouagadougou is the capital of Burkina Faso, a country in West Africa."
     },
     {
-        question: "What's the best way to watch a fly fishing tournament?",
+        question: "In what year did the French Revolution begin?",
         answers: [
-            { text: "Live stream", correct: true },
-            { text: "On the river bank", correct: false },
-            { text: "Through binoculars", correct: false },
-            { text: "On a fish-eye lens", correct: false }
-        ]
+            { text: "1776", correct: false },
+            { text: "1789", correct: true },
+            { text: "1804", correct: false },
+            { text: "1815", correct: false }
+        ],
+        difficulty: "medium",
+        feedback: "The French Revolution began in 1789 with the Storming of the Bastille on July 14th."
+    },
+    {
+        question: "What is the chemical symbol for the element Tungsten?",
+        answers: [
+            { text: "Tu", correct: false },
+            { text: "Tn", correct: false },
+            { text: "W", correct: true },
+            { text: "Tg", correct: false }
+        ],
+        difficulty: "medium",
+        feedback: "Tungsten's chemical symbol is W, which comes from its other name, Wolfram."
+    },
+    {
+        question: "What is the value of π (pi) to 7 decimal places?",
+        answers: [
+            { text: "3.1415926", correct: true },
+            { text: "3.1415927", correct: false },
+            { text: "3.1415928", correct: false },
+            { text: "3.1415929", correct: false }
+        ],
+        difficulty: "hard",
+        feedback: "The value of π (pi) to 7 decimal places is 3.1415926. It's an irrational number, which means its decimal representation never ends or repeats."
+    },
+    {
+        question: "What is the Fibonacci sequence for the first 8 numbers?",
+        answers: [
+            { text: "0, 1, 1, 2, 3, 5, 8, 13", correct: true },
+            { text: "1, 1, 2, 3, 5, 8, 13, 21", correct: false },
+            { text: "0, 1, 2, 3, 5, 8, 13, 21", correct: false },
+            { text: "1, 2, 3, 5, 8, 13, 21, 34", correct: false }
+        ],
+        difficulty: "hard",
+        feedback: "The Fibonacci sequence starts with 0 and 1, and each subsequent number is the sum of the two preceding ones."
+    },
+    {
+        question: "What is the half-life of Carbon-14?",
+        answers: [
+            { text: "5,730 years", correct: true },
+            { text: "1,000 years", correct: false },
+            { text: "10,000 years", correct: false },
+            { text: "50,000 years", correct: false }
+        ],
+        difficulty: "hard",
+        feedback: "The half-life of Carbon-14 is approximately 5,730 years. This makes it useful for dating organic materials up to about 60,000 years old."
     }
 ];
 
@@ -62,21 +116,32 @@ const showAnswersButton = document.getElementById('show-answers-button');
 const timerDisplay = document.getElementById('timer');
 const progressBar = document.getElementById('progress-bar');
 const confettiContainer = document.getElementById('confetti-container');
+const difficultySelection = document.getElementById('difficulty-selection');
+const difficultyButtons = document.querySelectorAll('.difficulty-button');
+const feedbackContainer = document.getElementById('feedback-container');
+const feedbackText = document.getElementById('feedback-text');
+const starRating = document.getElementById('star-rating');
+const stars = document.querySelectorAll('.star');
 
 let currentQuestionIndex = 0;
 let score = 0;
-let answeredQuestions = new Array(questions.length).fill(false);
+let answeredQuestions = [];
 let timeLeft = 60;
 let timerInterval;
+let selectedDifficulty = '';
+let currentQuestions = [];
 
 // Initialize quiz
-function startQuiz() {
+function startQuiz(difficulty) {
+    selectedDifficulty = difficulty;
+    currentQuestions = questions.filter(q => q.difficulty === difficulty);
     currentQuestionIndex = 0;
     score = 0;
-    answeredQuestions = new Array(questions.length).fill(false);
+    answeredQuestions = new Array(currentQuestions.length).fill(false);
     nextButton.innerHTML = "Next";
     resultContainer.style.display = "none";
     questionContainer.style.display = "block";
+    difficultySelection.style.display = "none";
     startTimer();
     showQuestion();
 }
@@ -84,7 +149,7 @@ function startQuiz() {
 // Display current question
 function showQuestion() {
     resetState();
-    let currentQuestion = questions[currentQuestionIndex];
+    let currentQuestion = currentQuestions[currentQuestionIndex];
     let questionNo = currentQuestionIndex + 1;
     questionText.innerHTML = questionNo + ". " + currentQuestion.question;
     questionText.classList.add('fade-in');
@@ -112,6 +177,8 @@ function resetState() {
         answerButtons.removeChild(answerButtons.firstChild);
     }
     questionText.classList.remove('fade-in');
+    feedbackContainer.style.display = "none";
+    feedbackContainer.classList.remove("correct", "incorrect");
 }
 
 // Handle answer selection
@@ -122,8 +189,10 @@ function selectAnswer(e) {
         selectedButton.classList.add("correct", "bg-green-500", "text-white");
         score++;
         createConfetti();
+        feedbackContainer.classList.add("correct");
     } else {
         selectedButton.classList.add("incorrect", "bg-red-500", "text-white");
+        feedbackContainer.classList.add("incorrect");
     }
     Array.from(answerButtons.children).forEach(button => {
         if (button.dataset.correct === "true") {
@@ -134,6 +203,14 @@ function selectAnswer(e) {
     answeredQuestions[currentQuestionIndex] = true;
     updateScore();
     updateNavigationButtons();
+    showFeedback(currentQuestions[currentQuestionIndex].feedback);
+}
+
+// Show feedback
+function showFeedback(feedback) {
+    feedbackText.textContent = feedback;
+    feedbackContainer.style.display = "block";
+    feedbackContainer.classList.add("fade-in");
 }
 
 // Update score display
@@ -153,7 +230,7 @@ function updateNavigationButtons() {
         prevButton.style.display = "block";
     }
 
-    if (currentQuestionIndex === questions.length - 1) {
+    if (currentQuestionIndex === currentQuestions.length - 1) {
         nextButton.innerHTML = "Finish";
     } else {
         nextButton.innerHTML = "Next";
@@ -168,15 +245,15 @@ function updateNavigationButtons() {
 
 // Update progress display
 function updateProgress() {
-    progressDisplay.innerHTML = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-    const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+    progressDisplay.innerHTML = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+    const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
     progressBar.style.width = `${progress}%`;
 }
 
 // Handle next button click
 nextButton.addEventListener("click", () => {
     currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
+    if (currentQuestionIndex < currentQuestions.length) {
         showQuestion();
     } else {
         showResult();
@@ -194,19 +271,20 @@ function showResult() {
     resetState();
     clearInterval(timerInterval);
     questionText.innerHTML = "Quiz Completed!";
-    finalScoreDisplay.innerHTML = `Your score: ${score} out of ${questions.length}`;
+    finalScoreDisplay.innerHTML = `Your score: ${score} out of ${currentQuestions.length}`;
     resultContainer.style.display = "block";
     resultContainer.classList.add("fade-in");
     nextButton.style.display = "none";
     prevButton.style.display = "none";
     questionContainer.style.display = "none";
-    timerDisplay.timerDisplay.parentElement.style.display = "none";
+    timerDisplay.parentElement.style.display = "none";
     createConfetti();
 }
 
 // Handle retry button click
 retryButton.addEventListener("click", () => {
-    startQuiz();
+    difficultySelection.style.display = "block";
+    resultContainer.style.display = "none";
 });
 
 // Handle show answers button click
@@ -218,7 +296,7 @@ showAnswersButton.addEventListener("click", () => {
 function showAnswers() {
     resetState();
     questionText.innerHTML = "Correct Answers";
-    questions.forEach((question, index) => {
+    currentQuestions.forEach((question, index) => {
         const answerParagraph = document.createElement("p");
         answerParagraph.classList.add("mb-2", "fade-in");
         answerParagraph.style.animationDelay = `${index * 0.1}s`;
@@ -293,6 +371,62 @@ particlesJS('particles-js', {
     retina_detect: true
 });
 
-// Start the quiz
-startQuiz();
+// Handle difficulty selection
+difficultyButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const difficulty = button.dataset.difficulty;
+        startQuiz(difficulty);
+    });
+});
+
+// Handle star rating
+stars.forEach(star => {
+    star.addEventListener('click', () => {
+        const rating = parseInt(star.dataset.rating);
+        setRating(rating);
+    });
+
+    star.addEventListener('mouseover', () => {
+        const rating = parseInt(star.dataset.rating);
+        highlightStars(rating);
+    });
+
+    star.addEventListener('mouseout', () => {
+        resetStars();
+    });
+});
+
+function setRating(rating) {
+    stars.forEach(star => {
+        const starRating = parseInt(star.dataset.rating);
+        if (starRating <= rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+function highlightStars(rating) {
+    stars.forEach(star => {
+        const starRating = parseInt(star.dataset.rating);
+        if (starRating <= rating) {
+            star.classList.add('text-yellow-400');
+        } else {
+            star.classList.remove('text-yellow-400');
+        }
+    });
+}
+
+function resetStars() {
+    stars.forEach(star => {
+        if (!star.classList.contains('active')) {
+            star.classList.remove('text-yellow-400');
+        }
+    });
+}
+
+// Start with difficulty selection
+difficultySelection.style.display = "block";
+questionContainer.style.display = "none";
 

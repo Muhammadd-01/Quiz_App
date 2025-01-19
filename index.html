@@ -3,45 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Fun Quiz Adventure!</title>
+    <title>Super Fun Mind-Training Quiz Adventure!</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex items-center justify-center">
+<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex flex-col justify-between">
     <div id="particles-js" class="absolute inset-0"></div>
-    <div id="quiz-container" class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full relative overflow-hidden">
-        <h1 class="text-4xl font-bold mb-6 text-center text-purple-600">Super Fun Quiz Adventure!</h1>
-        
-        <div id="question-container" class="mb-6">
-            <h2 id="question-text" class="text-2xl mb-4 text-gray-800"></h2>
-            <div id="answer-buttons" class="grid grid-cols-1 gap-2"></div>
-        </div>
-        
-        <div id="controls" class="flex justify-between items-center">
-            <button id="prev-button" class="quiz-button bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors transform hover:scale-105">Previous</button>
-            <div id="progress" class="text-gray-600"></div>
-            <button id="next-button" class="quiz-button bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors transform hover:scale-105">Next</button>
-        </div>
-        
-        <div id="score-container" class="mt-4 text-center">
-            <p class="text-xl">Score: <span id="score" class="font-bold text-2xl text-purple-600">0</span></p>
-        </div>
+    <main class="flex-grow flex items-center justify-center py-8">
+        <div id="quiz-container" class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full relative overflow-hidden">
+            <h1 class="text-4xl font-bold mb-6 text-center text-purple-600">Super Fun Mind-Training Quiz Adventure!</h1>
+            
+            <div id="difficulty-selection" class="mb-6">
+                <h2 class="text-2xl mb-2 text-gray-800">Select Difficulty:</h2>
+                <div class="flex justify-between">
+                    <button class="difficulty-button bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors transform hover:scale-105" data-difficulty="easy">Easy</button>
+                    <button class="difficulty-button bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 transition-colors transform hover:scale-105" data-difficulty="medium">Medium</button>
+                    <button class="difficulty-button bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors transform hover:scale-105" data-difficulty="hard">Hard</button>
+                </div>
+            </div>
+            
+            <div id="question-container" class="mb-6 hidden">
+                <h2 id="question-text" class="text-2xl mb-4 text-gray-800"></h2>
+                <div id="answer-buttons" class="grid grid-cols-1 gap-2"></div>
+            </div>
+            
+            <div id="feedback-container" class="mb-4 hidden">
+                <p id="feedback-text" class="text-lg text-gray-800"></p>
+            </div>
+            
+            <div id="controls" class="flex justify-between items-center">
+                <button id="prev-button" class="quiz-button bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors transform hover:scale-105">Previous</button>
+                <div id="progress" class="text-gray-600"></div>
+                <button id="next-button" class="quiz-button bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors transform hover:scale-105">Next</button>
+            </div>
+            
+            <div id="score-container" class="mt-4 text-center">
+                <p class="text-xl">Score: <span id="score" class="font-bold text-2xl text-purple-600">0</span></p>
+            </div>
 
-        <div id="timer-container" class="mt-4 text-center">
-            <p class="text-lg">Time left: <span id="timer" class="font-bold text-xl text-red-500">60</span> seconds</p>
-        </div>
+            <div id="timer-container" class="mt-4 text-center">
+                <p class="text-lg">Time left: <span id="timer" class="font-bold text-xl text-red-500">60</span> seconds</p>
+            </div>
 
-        <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-            <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+            
+            <div id="result-container" class="hidden mt-6 text-center">
+                <h2 class="text-3xl font-bold mb-4 text-purple-600">Quiz Completed!</h2>
+                <p id="final-score" class="text-2xl mb-4 text-gray-800"></p>
+                <div id="rating-container" class="mb-4">
+                    <h3 class="text-xl mb-2 text-gray-800">Rate this quiz:</h3>
+                    <div id="star-rating" class="flex justify-center">
+                        <span class="star text-4xl cursor-pointer" data-rating="1">⭐</span>
+                        <span class="star text-4xl cursor-pointer" data-rating="2">⭐</span>
+                        <span class="star text-4xl cursor-pointer" data-rating="3">⭐</span>
+                        <span class="star text-4xl cursor-pointer" data-rating="4">⭐</span>
+                        <span class="star text-4xl cursor-pointer" data-rating="5">⭐</span>
+                    </div>
+                </div>
+                <button id="retry-button" class="quiz-button bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-yellow-600 transition-colors transform hover:scale-105 mr-2">Retry Quiz</button>
+                <button id="show-answers-button" class="quiz-button bg-indigo-500 text-white px-6 py-3 rounded-full hover:bg-indigo-600 transition-colors transform hover:scale-105">Show Answers</button>
+            </div>
         </div>
-        
-        <div id="result-container" class="hidden mt-6 text-center">
-            <h2 class="text-3xl font-bold mb-4 text-purple-600">Quiz Completed!</h2>
-            <p id="final-score" class="text-2xl mb-4 text-gray-800"></p>
-            <button id="retry-button" class="quiz-button bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-yellow-600 transition-colors transform hover:scale-105 mr-2">Retry Quiz</button>
-            <button id="show-answers-button" class="quiz-button bg-indigo-500 text-white px-6 py-3 rounded-full hover:bg-indigo-600 transition-colors transform hover:scale-105">Show Answers</button>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-4 text-center">
+        <p>Created with ❤️ by Your Name</p>
+        <p>© 2023 Super Fun Quiz Adventure. All rights reserved.</p>
+        <div class="mt-2">
+            <a href="#" class="text-blue-400 hover:text-blue-300 mx-2">Twitter</a>
+            <a href="#" class="text-blue-400 hover:text-blue-300 mx-2">GitHub</a>
+            <a href="#" class="text-blue-400 hover:text-blue-300 mx-2">LinkedIn</a>
         </div>
-    </div>
+    </footer>
 
     <div id="confetti-container" class="fixed inset-0 pointer-events-none hidden"></div>
 
