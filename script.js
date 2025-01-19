@@ -16,9 +16,11 @@ const feedbackContainer = document.getElementById('feedback-container');
 const feedbackText = document.getElementById('feedback-text');
 const starRating = document.getElementById('star-rating');
 const stars = document.querySelectorAll('.star');
-const gokuImage = document.getElementById('goku-image');
-const gokuContainer = document.getElementById('goku-container');
-const gokuSprite = document.getElementById('goku-sprite');
+const characterImage = document.getElementById('character-image');
+const characterContainer = document.getElementById('character-container');
+const shenronContainer = document.getElementById('shenron-container');
+const villainContainer = document.getElementById('villain-container');
+const villainImage = document.getElementById('villain-image');
 
 let currentQuestionIndex = 0;
 let score = 0;
@@ -27,32 +29,77 @@ let timeLeft = 60;
 let timerInterval;
 let currentQuestions = [];
 
-// Fetch questions from API
-async function fetchQuestions() {
-    try {
-        const response = await fetch('https://opentdb.com/api.php?amount=10&type=multiple');
-        const data = await response.json();
-        return data.results.map(q => ({
-            question: q.question,
-            answers: [
-                { text: q.correct_answer, correct: true },
-                ...q.incorrect_answers.map(answer => ({ text: answer, correct: false }))
-            ].sort(() => Math.random() - 0.5),
-            feedback: `The correct answer is: ${q.correct_answer}`
-        }));
-    } catch (error) {
-        console.error('Error fetching questions:', error);
-        return [];
+const dbzCharacters = [
+    { name: 'Goku', image: '/placeholder.svg?height=128&width=128' },
+    { name: 'Vegeta', image: '/placeholder.svg?height=128&width=128' },
+    { name: 'Gohan', image: '/placeholder.svg?height=128&width=128' },
+    { name: 'Piccolo', image: '/placeholder.svg?height=128&width=128' },
+    { name: 'Trunks', image: '/placeholder.svg?height=128&width=128' }
+];
+
+const dbzVillains = [
+    { name: 'Frieza', image: '/placeholder.svg?height=300&width=300' },
+    { name: 'Cell', image: '/placeholder.svg?height=300&width=300' },
+    { name: 'Majin Buu', image: '/placeholder.svg?height=300&width=300' },
+    { name: 'Broly', image: '/placeholder.svg?height=300&width=300' }
+];
+
+const dbzQuestions = [
+    {
+        question: "Who is Goku's rival and Saiyan prince?",
+        answers: [
+            { text: 'Vegeta', correct: true },
+            { text: 'Piccolo', correct: false },
+            { text: 'Frieza', correct: false },
+            { text: 'Krillin', correct: false }
+        ],
+        feedback: "Vegeta is Goku's rival and the prince of all Saiyans."
+    },
+    {
+        question: "What is the name of Goku's signature attack?",
+        answers: [
+            { text: 'Kamehameha', correct: true },
+            { text: 'Spirit Bomb', correct: false },
+            { text: 'Galick Gun', correct: false },
+            { text: 'Destructo Disk', correct: false }
+        ],
+        feedback: "The Kamehameha is Goku's signature energy wave attack."
+    },
+    {
+        question: "Who is Gohan's mentor?",
+        answers: [
+            { text: 'Piccolo', correct: true },
+            { text: 'Goku', correct: false },
+            { text: 'Vegeta', correct: false },
+            { text: 'Krillin', correct: false }
+        ],
+        feedback: "Piccolo becomes Gohan's mentor and trains him in martial arts."
+    },
+    {
+        question: "What is the name of the wish-granting dragon in Dragon Ball Z?",
+        answers: [
+            { text: 'Shenron', correct: true },
+            { text: 'Porunga', correct: false },
+            { text: 'Eternal Dragon', correct: false },
+            { text: 'Omega Shenron', correct: false }
+        ],
+        feedback: "Shenron is the eternal dragon that grants wishes when the Dragon Balls are gathered."
+    },
+    {
+        question: "What is the highest level of Super Saiyan achieved in the original Dragon Ball Z series?",
+        answers: [
+            { text: 'Super Saiyan 3', correct: true },
+            { text: 'Super Saiyan', correct: false },
+            { text: 'Super Saiyan 2', correct: false },
+            { text: 'Super Saiyan 4', correct: false }
+        ],
+        feedback: "Super Saiyan 3 is the highest level achieved in the original Dragon Ball Z series."
     }
-}
+];
 
 // Initialize quiz
-async function startQuiz() {
-    currentQuestions = await fetchQuestions();
-    if (currentQuestions.length === 0) {
-        alert('Failed to fetch questions. Please try again later.');
-        return;
-    }
+function startQuiz() {
+    currentQuestions = [...dbzQuestions];
     currentQuestionIndex = 0;
     score = 0;
     answeredQuestions = new Array(currentQuestions.length).fill(false);
@@ -61,7 +108,7 @@ async function startQuiz() {
     questionContainer.style.display = "block";
     startTimer();
     showQuestion();
-    gokuFlyAcrossScreen();
+    createShenron();
 }
 
 // Display current question
@@ -86,6 +133,7 @@ function showQuestion() {
 
     updateNavigationButtons();
     updateProgress();
+    updateCharacter();
 }
 
 // Reset question state
@@ -97,7 +145,7 @@ function resetState() {
     questionText.classList.remove('fade-in');
     feedbackContainer.style.display = "none";
     feedbackContainer.classList.remove("correct", "incorrect");
-    gokuSprite.classList.remove("super-saiyan", "flying");
+    villainContainer.style.display = "none";
 }
 
 // Handle answer selection
@@ -109,11 +157,11 @@ function selectAnswer(e) {
         score++;
         createConfetti();
         feedbackContainer.classList.add("correct");
-        gokuPowerUp();
+        characterContainer.classList.add("power-up");
     } else {
         selectedButton.classList.add("incorrect", "bg-red-500", "text-white");
         feedbackContainer.classList.add("incorrect");
-        gokuNormal();
+        showVillain();
     }
     Array.from(answerButtons.children).forEach(button => {
         if (button.dataset.correct === "true") {
@@ -192,7 +240,7 @@ function showResult() {
     resetState();
     clearInterval(timerInterval);
     questionText.innerHTML = "Quiz Completed!";
-    finalScoreDisplay.innerHTML = `Your score: ${score} out of ${currentQuestions.length}`;
+    finalScoreDisplay.innerHTML = `Your power level: ${score * 1000} out of ${currentQuestions.length * 1000}`;
     resultContainer.style.display = "block";
     resultContainer.classList.add("fade-in");
     nextButton.style.display = "none";
@@ -201,9 +249,10 @@ function showResult() {
     timerDisplay.parentElement.style.display = "none";
     createConfetti();
     if (score > currentQuestions.length / 2) {
-        gokuSuperSaiyan();
+        characterImage.src = '/placeholder.svg?height=128&width=128'; // Super Saiyan image
+        characterContainer.classList.add("power-up");
     } else {
-        gokuNormal();
+        characterImage.src = '/placeholder.svg?height=128&width=128'; // Normal Goku image
     }
 }
 
@@ -322,27 +371,28 @@ function resetStars() {
     });
 }
 
-// Goku animations
-function gokuFlyAcrossScreen() {
-    gokuSprite.classList.add("flying");
-    setTimeout(() => {
-        gokuSprite.classList.remove("flying");
-    }, 5000);
+// Update character
+function updateCharacter() {
+    const character = dbzCharacters[Math.floor(Math.random() * dbzCharacters.length)];
+    characterImage.src = character.image;
+    characterImage.alt = character.name;
 }
 
-function gokuPowerUp() {
-    gokuSprite.classList.add("super-saiyan");
-    setTimeout(() => {
-        gokuSprite.classList.remove("super-saiyan");
-    }, 2000);
+// Create Shenron
+function createShenron() {
+    shenronContainer.innerHTML = '';
+    const shenronImage = document.createElement('img');
+    shenronImage.src = '/placeholder.svg?height=300&width=300';
+    shenronImage.alt = 'Shenron';
+    shenronContainer.appendChild(shenronImage);
 }
 
-function gokuSuperSaiyan() {
-    gokuSprite.classList.add("super-saiyan");
-}
-
-function gokuNormal() {
-    gokuSprite.classList.remove("super-saiyan");
+// Show villain
+function showVillain() {
+    const villain = dbzVillains[Math.floor(Math.random() * dbzVillains.length)];
+    villainImage.src = villain.image;
+    villainImage.alt = villain.name;
+    villainContainer.style.display = 'block';
 }
 
 // Start the quiz

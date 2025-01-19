@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dragon Ball Z Quiz Adventure!</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 min-h-screen flex flex-col justify-between">
+<body class="bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 min-h-screen flex flex-col justify-between overflow-hidden">
     <div id="shenron-container" class="fixed inset-0 pointer-events-none z-0"></div>
     <div id="particles-js" class="absolute inset-0"></div>
     <main class="flex-grow flex items-center justify-center py-8 relative z-10">
@@ -67,6 +70,8 @@
         <img id="villain-image" src="/placeholder.svg?height=300&width=300" alt="DBZ Villain" class="absolute bottom-0 right-0 w-64 h-64 object-contain">
     </div>
 
+    <div id="attack-effect" class="fixed inset-0 pointer-events-none hidden z-30"></div>
+
     <footer class="bg-gray-800 text-white py-4 text-center relative z-10">
         <p>Created with 🐉 by Dragon Ball Z Quiz Masters</p>
         <p>© 2023 Dragon Ball Z Quiz Adventure. All rights reserved.</p>
@@ -77,7 +82,7 @@
         </div>
     </footer>
 
-    <div id="confetti-container" class="fixed inset-0 pointer-events-none hidden z-30"></div>
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none hidden z-40"></div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="script.js"></script>
